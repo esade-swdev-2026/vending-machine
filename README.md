@@ -1,9 +1,6 @@
 # app
 
-> **First thing: rename `app` to your project.** It appears in this file, in
-> `pyproject.toml` (`name`, `[project.scripts]`, `[tool.hatch.build.targets.wheel]`),
-> in the folder `src/app/`, and in the imports under `tests/`. Session 5's lab walks
-> you through it.
+> A terminal-based vending machine simulator.
 
 One or two sentences on what your program does and who it is for.
 
@@ -21,9 +18,8 @@ and CI resolve the same ones. When you change a dependency in `pyproject.toml`, 
 ## Run
 
 ```
-uv run app --help
-uv run app greet World
-uv run app greet World --count 3
+uv run vending-machine --help
+uv run vending-machine display-budget "€" --amount 2.55
 ```
 
 ## Develop

@@ -1,28 +1,16 @@
 from typer.testing import CliRunner
 
-from app.cli import app
+from vending_machine.cli import app
 
 runner = CliRunner()
 
 
-def test_greet_says_hello() -> None:
-    result = runner.invoke(app, ["greet", "Ada"])
+def test_add_reports_the_amount() -> None:
+    result = runner.invoke(app, ["display-budget", "€", "--amount", "2.55"])
     assert result.exit_code == 0
-    assert "Hello, Ada!" in result.stdout
+    assert "2.55€" in result.stdout
 
 
-def test_greet_repeats_with_count() -> None:
-    result = runner.invoke(app, ["greet", "Ada", "--count", "3"])
-    assert result.exit_code == 0
-    assert result.stdout.count("Hello, Ada!") == 3
-
-
-def test_greet_rejects_bad_count() -> None:
-    result = runner.invoke(app, ["greet", "Ada", "--count", "0"])
+def test_add_rejects_a_non_positive_amount() -> None:
+    result = runner.invoke(app, ["display-budget", "€", "--amount", "-1"])
     assert result.exit_code == 1
-
-
-def test_bye_says_goodbye() -> None:
-    result = runner.invoke(app, ["bye", "Ada"])
-    assert result.exit_code == 0
-    assert "Goodbye, Ada." in result.stdout
