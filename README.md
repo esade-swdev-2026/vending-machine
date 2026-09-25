@@ -1,8 +1,6 @@
-# app
+# Vending Machine
 
 > A terminal-based vending machine simulator.
-
-One or two sentences on what your program does and who it is for.
 
 ## Install
 
