@@ -26,10 +26,10 @@ def display_budget(currency: str, amount: float = 0) -> None:
         message = format_budget_message(currency, amount)
         typer.echo(message)
     except ValueError as e:
-        typer.echo(str(e), err=True)
+        typer.echo(str(e))
         raise typer.Exit(code=1) from e
 
-@app.command()
+
 def display_possible_products_by_budget(
     products_in_machine: dict[str, Products_details], 
     budget: float = 0
