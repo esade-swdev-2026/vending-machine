@@ -59,11 +59,11 @@ def test_return_empty_list_if_budget_too_low() -> None:
 
 def test_return_products_with_exact_budget() -> None:
     products_in_machine = {
-        'Patatas': Products_details(5, 1.5),
-        'Galletas': Products_details(10, 1.5)
+        'Choco bons': Products_details(5, 1.5),
+        'KitKat': Products_details(10, 1.5)
     }
     result = display_possible_products_by_budget(products_in_machine, budget=1.5)
-    assert result == ['Patatas', 'Galletas']
+    assert result == ['Choco bons', 'KitKat']
 
 def test_return_empty_list_if_no_products_in_machine() -> None:
     products_in_machine: dict[str, Products_details] = {}
