@@ -11,7 +11,7 @@ def main() -> None:
 
 
 @app.command()
-def display_budget(currency: str ='€', amount: float = 0) -> None:
+def display_budget(currency: str = "€", amount: float = 0) -> None:
     try:
         message = format_budget_message(currency, amount)
         typer.echo(message)
