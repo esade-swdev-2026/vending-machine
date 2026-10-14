@@ -11,13 +11,13 @@ def main() -> None:
 
 
 @app.command()
-def display_budget(currency: str, amount: float = 0) -> None:
+def display_budget(currency: str ='€', amount: float = 0) -> None:
     try:
         message = format_budget_message(currency, amount)
         typer.echo(message)
-    except ValueError as e:
-        typer.echo(str(e))
-        raise typer.Exit(code=1) from e
+    except ValueError as error:
+        typer.echo(str(error))
+        raise typer.Exit(code=1) from error
 
 
 if __name__ == "__main__":

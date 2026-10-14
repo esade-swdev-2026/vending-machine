@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 
-@dataclass
+@dataclass (frozen=True)
 class ProductDetails:
     quantity: int
     price: float
