@@ -16,9 +16,5 @@ def display_budget(currency: str = "€", amount: float = 0) -> None:
         message = format_budget_message(currency, amount)
         typer.echo(message)
     except ValueError as error:
-        typer.echo(str(error))
+        typer.echo(str(error), err=True)
         raise typer.Exit(code=1) from error
-
-
-if __name__ == "__main__":
-    app()

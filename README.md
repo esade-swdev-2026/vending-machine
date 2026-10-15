@@ -17,7 +17,7 @@ and CI resolve the same ones. When you change a dependency in `pyproject.toml`, 
 
 ```
 uv run vending-machine --help
-uv run vending-machine display-budget "€" --amount 2.55
+uv run vending-machine display-budget --currency "$" --amount 2.55
 ```
 
 ## Develop
@@ -35,7 +35,7 @@ If they pass here, CI passes.
 ## Layout
 
 ```
-src/app/          your package — importable, installable, not just a script
+src/vending_machine/          your package —            importable, installable, not just a script
   cli.py          the typer command-line interface
   __main__.py     lets `python -m app` work
 tests/            pytest tests, mirroring src/
