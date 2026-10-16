@@ -18,3 +18,8 @@ def display_budget(currency: str = "€", amount: float = 0) -> None:
     except ValueError as error:
         typer.echo(str(error), err=True)
         raise typer.Exit(code=1) from error
+
+#aqui todas las funciones con typer
+#quitamos la de display_budget
+#añadimos: products, affordable, buy (todas con @app.command())
+

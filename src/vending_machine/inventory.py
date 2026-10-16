@@ -9,3 +9,6 @@ def get_possible_products_by_budget(
         if product.quantity > 0 and product.price <= budget:
             available.append(product)
     return available
+
+#en vez de esta funcion, hacer una funcion llamada find_product y otra llamada affordable_products
+
