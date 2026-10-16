@@ -1,3 +1,6 @@
-#los productos con esta estructura
-
-slot, name, price_cents, quantity
+slot,name,price_cents,quantity
+1,Choco bons,150,10
+2,KitKat,130,5
+3,Kinder Bueno,180,0
+4,Water,100,8
+5,Coca-Cola,200,6
