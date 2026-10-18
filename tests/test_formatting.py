@@ -1,4 +1,4 @@
-from vending_machine.formatting import format_cents, format_product_lines
+from vending_machine.formatting import format_cents, format_change, format_product_lines
 from vending_machine.models import Product
 
 
@@ -15,3 +15,11 @@ def test_format_product_lines_shows_sold_out() -> None:
     lines = format_product_lines(products)
     assert "KitKat" in lines[0] and "1.30 €" in lines[0]
     assert "SOLD OUT" in lines[1]
+
+
+def test_format_change_lists_each_coin_with_its_count() -> None:
+    assert format_change({20: 2, 50: 1}) == "1 x 0.50 € + 2 x 0.20 €"
+
+
+def test_format_change_for_exact_payment() -> None:
+    assert format_change({}) == "none"

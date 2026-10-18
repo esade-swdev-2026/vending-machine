@@ -1,14 +1,15 @@
+from collections import Counter
 from pathlib import Path
 from typing import Annotated
 
 import typer
 
-from vending_machine.formatting import format_cents, format_product_lines
+from vending_machine.formatting import format_cents, format_change, format_product_lines
 from vending_machine.inventory import affordable_products
 from vending_machine.machine import sell
 from vending_machine.models import VendingError
 from vending_machine.payment import credit_from_coins
-from vending_machine.storage import read_coin_float, read_products
+from vending_machine.storage import read_products, read_state, write_state
 
 app = typer.Typer(help="A vending machine")
 
@@ -36,7 +37,7 @@ def products(
 ) -> None:
     """List every product, including the sold-out ones."""
     try:
-        for line in format_product_lines(read_products(stock)):
+        for line in format_product_lines(list(read_products(stock).values())):
             typer.echo(line)
     except (VendingError, OSError, ValueError) as error:
         raise fail(error) from error
@@ -50,7 +51,7 @@ def affordable(
 ) -> None:
     """List the products you can buy with the given coins."""
     try:
-        credit = credit_from_coins(coins)
+        credit = credit_from_coins(Counter(coins))
         typer.echo(f"Credit: {format_cents(credit)}")
         for line in format_product_lines(affordable_products(read_products(stock), credit)):
             typer.echo(line)
@@ -65,11 +66,11 @@ def buy(
     stock: StockOption = DEFAULT_STOCK,
     coins_file: CoinsFileOption = DEFAULT_COINS_FILE,
 ) -> None:
-    """Buy the product in SLOT with the given coins."""
+    """Buy the product in SLOT with the given coins, and save the new stock and coins."""
     try:
-        sale = sell(read_products(stock), slot, coins, read_coin_float(coins_file))
-        typer.echo(f"Enjoy your {sale.product.name}!")
-        change = " + ".join(format_cents(coin) for coin in sale.change) or "none"
-        typer.echo(f"Change: {change}")
+        result = sell(read_state(stock, coins_file), slot, Counter(coins))
+        write_state(result.state, stock, coins_file)
+        typer.echo(f"Enjoy your {result.sale.product.name}!")
+        typer.echo(f"Change: {format_change(result.sale.change)}")
     except (VendingError, OSError, ValueError) as error:
         raise fail(error) from error
