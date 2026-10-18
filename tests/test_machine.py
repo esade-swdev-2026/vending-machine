@@ -23,21 +23,29 @@ def total_cents(coins: Coins) -> int:
 
 
 def test_sell_returns_the_product_and_the_change() -> None:
-    assert sell(STATE, 1, {200: 1}).sale == Sale(KITKAT, {50: 1, 20: 1})
+    coins = {200: 1}
+    result = sell(STATE, 1, coins)
+    assert result.sale == Sale(KITKAT, {50: 1, 20: 1})
 
 
 def test_sell_takes_one_unit_out_of_stock() -> None:
-    assert sell(STATE, 1, {200: 1}).state.products[1].quantity == 4
+    coins = {200: 1}
+    result = sell(STATE, 1, coins)
+    assert result.state.products[1].quantity == 4
 
 
 def test_sell_keeps_the_inserted_coins_and_removes_the_change() -> None:
-    new_float = sell(STATE, 1, {200: 1}).state.coin_float
-    assert new_float == {200: 1, 50: 4, 20: 4, 10: 5}
+    coins = {200: 1}
+    result = sell(STATE, 1, coins)
+    assert result.state.coin_float == {200: 1, 50: 4, 20: 4, 10: 5}
 
 
-def test_money_in_the_machine_grows_by_the_price() -> None:
-    new_float = sell(STATE, 1, {100: 1, 50: 1}).state.coin_float
-    assert total_cents(new_float) == total_cents(STATE.coin_float) + KITKAT.price_cents
+def test_money_in_the_machine_grows_by_price() -> None:
+    coins = {100: 1, 50: 1}
+    result = sell(STATE, 1, coins)
+    assert total_cents(result.state.coin_float) == (
+        total_cents(STATE.coin_float) + KITKAT.price_cents
+    )
 
 
 def test_selling_the_last_unit_sells_the_product_out() -> None:
@@ -49,13 +57,16 @@ def test_selling_the_last_unit_sells_the_product_out() -> None:
 
 def test_sell_does_not_change_the_state_it_was_given() -> None:
     state = MachineState(dict(PRODUCTS), {50: 5, 20: 5, 10: 5})
-    sell(state, 1, {200: 1})
+    coins = {200: 1}
+    _ = sell(state, 1, coins)
     assert state == STATE
 
 
 def test_sell_can_give_back_coins_the_customer_just_inserted() -> None:
     state = MachineState(PRODUCTS, {50: 0, 20: 0})
-    assert sell(state, 1, {100: 1, 20: 2, 10: 1}).sale == Sale(KITKAT, {20: 1})
+    coins = {100: 1, 20: 2, 10: 1}
+    result = sell(state, 1, coins)
+    assert result.sale == Sale(KITKAT, {20: 1})
 
 
 def test_sell_raises_for_unknown_slot() -> None:

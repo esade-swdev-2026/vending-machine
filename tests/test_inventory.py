@@ -46,12 +46,16 @@ def test_return_products_with_exact_budget() -> None:
 
 
 def test_return_empty_list_if_no_products_in_machine() -> None:
-    result = affordable_products({}, credit_cents=200)
+    products: Products = {}
+    result = affordable_products(products, credit_cents=200)
     assert result == []
 
 
 def test_find_product_returns_product_in_slot() -> None:
-    products = by_slot(Product(1, "Choco bons", 150, 10), Product(2, "KitKat", 130, 5))
+    products = by_slot(
+        Product(1, "Choco bons", 150, 10),
+        Product(2, "KitKat", 130, 5),
+    )
     assert find_product(products, 2) == Product(2, "KitKat", 130, 5)
 
 

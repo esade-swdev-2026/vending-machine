@@ -35,7 +35,6 @@ def main() -> None:
 def products(
     stock: StockOption = DEFAULT_STOCK, coins_file: CoinsFileOption = DEFAULT_COINS_FILE
 ) -> None:
-    """List every product, including the sold-out ones."""
     try:
         for line in format_product_lines(list(read_products(stock).values())):
             typer.echo(line)
@@ -49,7 +48,6 @@ def affordable(
     stock: StockOption = DEFAULT_STOCK,
     coins_file: CoinsFileOption = DEFAULT_COINS_FILE,
 ) -> None:
-    """List the products you can buy with the given coins."""
     try:
         credit = credit_from_coins(Counter(coins))
         typer.echo(f"Credit: {format_cents(credit)}")
@@ -66,7 +64,6 @@ def buy(
     stock: StockOption = DEFAULT_STOCK,
     coins_file: CoinsFileOption = DEFAULT_COINS_FILE,
 ) -> None:
-    """Buy the product in SLOT with the given coins, and save the new stock and coins."""
     try:
         result = sell(read_state(stock, coins_file), slot, Counter(coins))
         write_state(result.state, stock, coins_file)

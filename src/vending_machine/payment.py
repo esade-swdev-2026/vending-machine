@@ -26,7 +26,6 @@ def make_change(amount_cents: int, coin_float: Coins) -> Coins:
 
 
 def _find_change(amount_cents: int, coins: list[int], coin_float: Coins) -> Coins | None:
-    """Try as many of the biggest coin as possible; if the rest cannot be paid, use one fewer."""
     if amount_cents == 0:
         return {}
     if not coins:

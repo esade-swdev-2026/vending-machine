@@ -60,7 +60,6 @@ def write_state(state: MachineState, products_path: Path, coins_path: Path) -> N
 
 
 def _write_csv(path: Path, columns: list[str], rows: list[dict[str, int | str]]) -> None:
-    """Write to a temporary file first, so a crash never leaves a half-written CSV."""
     temporary = path.with_suffix(".tmp")
     with temporary.open("w", newline="", encoding="utf-8") as file:
         writer = csv.DictWriter(file, fieldnames=columns)

@@ -1,13 +1,15 @@
 from vending_machine.formatting import format_cents, format_change, format_product_lines
-from vending_machine.models import Product
+from vending_machine.models import Coins, Product
 
 
 def test_format_cents_as_euros() -> None:
-    assert format_cents(130) == "1.30 €"
+    amount_cents = 130
+    assert format_cents(amount_cents) == "1.30 €"
 
 
 def test_format_cents_below_one_euro() -> None:
-    assert format_cents(5) == "0.05 €"
+    amount_cents = 5
+    assert format_cents(amount_cents) == "0.05 €"
 
 
 def test_format_product_lines_shows_sold_out() -> None:
@@ -18,8 +20,10 @@ def test_format_product_lines_shows_sold_out() -> None:
 
 
 def test_format_change_lists_each_coin_with_its_count() -> None:
-    assert format_change({20: 2, 50: 1}) == "1 x 0.50 € + 2 x 0.20 €"
+    change = {20: 2, 50: 1}
+    assert format_change(change) == "1 x 0.50 € + 2 x 0.20 €"
 
 
 def test_format_change_for_exact_payment() -> None:
-    assert format_change({}) == "none"
+    change: Coins = {}
+    assert format_change(change) == "none"

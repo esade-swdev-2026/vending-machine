@@ -10,7 +10,6 @@ DATA = Path(__file__).parent.parent / "data"
 
 
 def copy_data_files(folder: Path) -> list[str]:
-    """buy saves the new stock, so each test works on its own copy of the data files."""
     stock = shutil.copy(DATA / "products.csv", folder / "products.csv")
     coins = shutil.copy(DATA / "machine_coins_change.csv", folder / "machine_coins_change.csv")
     return ["--stock", str(stock), "--coins-file", str(coins)]
