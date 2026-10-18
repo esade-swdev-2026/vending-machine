@@ -9,7 +9,7 @@ from vending_machine.storage import read_coin_float, read_products
 def test_read_products_and_coin_float(tmp_path: Path) -> None:
     products_file = tmp_path / "products.csv"
     products_file.write_text("slot,name,price_cents,quantity\n1,KitKat,130,5\n", encoding="utf-8")
-    coins_file = tmp_path / "coins.csv"
+    coins_file = tmp_path / "machine_coins_change.csv"
     coins_file.write_text("coin_cents,count\n50,3\n20,4\n", encoding="utf-8")
 
     assert read_products(products_file) == [Product(1, "KitKat", 130, 5)]

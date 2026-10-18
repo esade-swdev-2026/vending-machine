@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 
-ACCEPTED_COINS_CENTS: list[int] = [200, 100, 50, 20, 10, 5, 2, 1]
+ACCEPTED_COINS_CENTS: tuple[int, ...] = (200, 100, 50, 20, 10, 5, 2, 1)
 
 
 @dataclass(frozen=True)
 class Product:
     slot: int
-    product_name: str
-    quantity: int
+    name: str
     price_cents: int
+    quantity: int
 
 
 @dataclass(frozen=True)

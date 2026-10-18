@@ -6,7 +6,12 @@ from vending_machine.cli import app
 
 runner = CliRunner()
 DATA = Path(__file__).parent.parent / "data"
-FILES = ["--stock", str(DATA / "products.csv"), "--coins-file", str(DATA / "coins.csv")]
+FILES = [
+    "--stock",
+    str(DATA / "products.csv"),
+    "--coins-file",
+    str(DATA / "machine_coins_change.csv"),
+]  # noqa: E501
 
 
 def test_buy_prints_product_and_change() -> None:

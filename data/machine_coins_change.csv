@@ -1,4 +1,4 @@
-coin_value_cents,coins_amount
+coin_cents,count
 200,5
 100,10
 50,10
