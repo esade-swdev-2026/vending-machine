@@ -3,6 +3,7 @@
 # the same one, run on a machine none of us owns. From module 4, when you start
 # merging through pull requests, a red check blocks the merge.
 name: check
+run-name: Partial submission
 
 on:
   push:
