@@ -35,7 +35,7 @@ If they pass here, CI passes.
 ## Layout
 
 ```
-src/vending_machine/          your package —            importable, installable, not just a script
+src/vending_machine/          your package — importable, installable, not just a script
   cli.py          the typer command-line interface
   __main__.py     lets `python -m app` work
 tests/            pytest tests, mirroring src/

@@ -17,10 +17,6 @@ class Sale:
     change: list[int]
 
 
-# add error classes(VendingError):
-# UnknownSlot, SoldOut, InvalidCoin, InsufficientCredit, CannotMakeChange. --> REVIEW
-
-
 class VendingError(Exception):
     """Base class for every vending machine failure."""
 

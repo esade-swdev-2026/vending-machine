@@ -11,8 +11,3 @@ def format_product_lines(products: list[Product]) -> list[str]:
         price = "SOLD OUT" if product.quantity == 0 else format_cents(product.price_cents)
         lines.append(f"{product.slot:>3}  {product.product_name:<15} {price}")
     return lines
-
-
-# remove format budget message and replace with format_cents (lo que dijo masde deponer todo encents)
-# funcion format_product_lines, para poner los precios y los sold outs a los productos
-# cambia los objectos en lineas de texto listas para ser printeadas.

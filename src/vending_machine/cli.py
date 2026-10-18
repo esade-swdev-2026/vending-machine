@@ -10,16 +10,6 @@ from vending_machine.storage import read_coin_float, read_products
 app = typer.Typer(help="A vending machine")
 
 
-# @app.command() -->              #ver que hacemos con ella pq requiere de otra class
-# def display_budget(currency: str = "€", amount_cents: int = 0) -> None:
-# try:
-#  message = format_budget_message(currency, amount_cents)
-# typer.echo(message)
-# except ValueError as error:
-# typer.echo(str(error), err=True)
-# raise typer.Exit(code=1) from error
-
-
 def fail(error: Exception) -> typer.Exit:
     typer.echo(f"Error: {error}", err=True)
     return typer.Exit(code=1)

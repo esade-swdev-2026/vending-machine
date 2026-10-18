@@ -1,29 +1,17 @@
-import pytest
-
-from vending_machine.formatting import format_budget_message
-
-
-def test_budget_formats_the_amount_correctly() -> None:
-    currency = "€"
-    amount = 2.55
-    result = format_budget_message(currency, amount)
-    assert result == "Your current balance is: 2.55€"
+from vending_machine.formatting import format_cents, format_product_lines
+from vending_machine.models import Product
 
 
-def test_budget_formats_different_currency() -> None:
-    currency = "$"
-    amount = 5.5
-    result = format_budget_message(currency, amount)
-    assert result == "Your current balance is: 5.50$"
+def test_format_cents_as_euros() -> None:
+    assert format_cents(130) == "1.30 €"
 
 
-def test_budget_rounds_correctly() -> None:
-    currency = "€"
-    amount = 2.558
-    result = format_budget_message(currency, amount)
-    assert result == "Your current balance is: 2.56€"
+def test_format_cents_below_one_euro() -> None:
+    assert format_cents(5) == "0.05 €"
 
 
-def test_budget_raises_value_error_for_negative_amount() -> None:
-    with pytest.raises(ValueError):
-        format_budget_message("€", -1.0)
+def test_format_product_lines_shows_sold_out() -> None:
+    products = [Product(1, "KitKat", 130, 5), Product(2, "Kinder Bueno", 180, 0)]
+    lines = format_product_lines(products)
+    assert "KitKat" in lines[0] and "1.30 €" in lines[0]
+    assert "SOLD OUT" in lines[1]
