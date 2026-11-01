@@ -69,14 +69,20 @@ goes down by one, and `data/machine_coins_change.csv` gets the inserted coins an
 After 5 KitKat sales, `products` shows `SOLD OUT` for slot 2. A failed sale (any error below) saves nothing.
 To reset the sample data, run `git checkout data/`.
 
+### Owner: see which slots need a refill
+
+```
+$ uv run vending-machine refill
+1 slot(s) to refill:
+  3  Kinder Bueno    SOLD OUT
+```
+
 ### Options
 
-Every command accepts:
-
-| option               | default                         | meaning                         |
-|----------------------|---------------------------------|---------------------------------|
-| `--stock PATH`       | `data/products.csv`             | the products CSV file           |
-| `--coins-file PATH`  | `data/machine_coins_change.csv` | the coins available for change  |
+| option               | commands                                    | default                         | meaning                        |
+|----------------------|---------------------------------------------|---------------------------------|--------------------------------|
+| `--stock PATH`       | `products`, `affordable`, `buy`, `refill`   | `data/products.csv`             | the products CSV file          |
+| `--coins-file PATH`  | `buy`                                       | `data/machine_coins_change.csv` | the coins available for change |
 
 ## Errors
 
@@ -89,9 +95,12 @@ Bad input never shows a traceback: it prints `Error: ...` and exits with code 1.
 | coin that is not accepted            | `uv run vending-machine buy 1 3`                      | `Error: Coin 3 is not accepted.`                            |
 | not enough money                     | `uv run vending-machine buy 1 100`                    | `Error: Choco bons costs 150 cents, you inserted 100.`      |
 | the machine cannot make the change   | (when its coins run out)                              | `Error: Cannot give 70 cents of change.`                    |
-| missing data file                    | `uv run vending-machine products --stock missing.csv` | `Error: [Errno 2] No such file or directory: 'missing.csv'` |
+| missing data file                    | `uv run vending-machine products --stock missing.csv` | `Error: missing.csv not found. Run from the repository root.` |
 | bad row in a data file               | (e.g. a price that is not a number)                   | `Error: data/products.csv: bad product on line 3.`          |
 | the same slot twice in the CSV       | (two rows with slot `1`)                              | `Error: data/products.csv: slot 1 is repeated on line 3.`   |
+| price of 0 or less in the CSV        | (a row with `price_cents` = `-50`)                    | `Error: data/products.csv: price must be more than 0 on line 2.` |
+| negative quantity in the CSV         | (a row with `quantity` = `-3`)                        | `Error: data/products.csv: quantity cannot be negative on line 2.` |
+| unknown coin in the coin file        | (a row with `coin_cents` = `3`)                       | `Error: data/machine_coins_change.csv: coin 3 is not accepted on line 2.` |
 
 ## Data files
 
@@ -101,8 +110,9 @@ Bad input never shows a traceback: it prints `Error: ...` and exits with code 1.
 |---------------|----------------------------------|
 | `slot`        | slot number (integer)            |
 | `name`        | product name                     |
-| `price_cents` | price in cents (integer)         |
-| `quantity`    | units left; `0` shows SOLD OUT   |
+| `price_cents` | price in cents (integer, more than 0)      |
+| `quantity`    | units left (0 or more); `0` shows SOLD OUT |
+
 
 `data/machine_coins_change.csv`, the coins the machine holds to give change:
 
@@ -149,7 +159,7 @@ The machine is plain data, and a sale is a function from the machine before to t
 src/vending_machine/
   models.py       Product, Sale, MachineState, SaleResult, the Coins/Products types,
                   the accepted coins and the error classes (no I/O)
-  inventory.py    find_product, affordable_products (pure)
+  inventory.py    find_product, affordable_products, empty_slots (pure)
   payment.py      credit_from_coins, add_coins, remove_coins, make_change (pure)
   machine.py      sell: one whole purchase, old state in, new state out (pure)
   formatting.py   format_cents, format_change, format_product_lines (pure)
