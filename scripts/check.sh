@@ -1,6 +1,8 @@
+#!/usr/bin/env bash
+# Runs the same four checks as CI, in the same order, and stops at the first failure.
 set -euo pipefail
 
-uv run ruff check 
-uv run ruff format  
-uv run mypy src tests
-uv run pytest
+echo "==> ruff check";  uv run ruff check .
+echo "==> ruff format"; uv run ruff format --check .
+echo "==> mypy";        uv run mypy src tests
+echo "==> pytest";      uv run pytest
