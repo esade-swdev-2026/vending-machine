@@ -9,4 +9,12 @@ def find_product(products: Products, slot: int) -> Product:
 
 
 def affordable_products(products: Products, credit_cents: int) -> list[Product]:
-    return [p for p in products.values() if p.quantity > 0 and p.price_cents <= credit_cents]
+    return [
+        product
+        for product in products.values()
+        if product.quantity > 0 and product.price_cents <= credit_cents
+    ]
+
+
+def empty_slots(products: Products) -> list[Product]:
+    return [product for product in products.values() if product.quantity <= 0]
