@@ -1,6 +1,6 @@
 import pytest
 
-from vending_machine.inventory import affordable_products, find_product
+from vending_machine.inventory import affordable_products, empty_slots, find_product
 from vending_machine.models import Product, Products, UnknownSlot
 
 
@@ -62,3 +62,22 @@ def test_find_product_returns_product_in_slot() -> None:
 def test_find_product_raises_for_unknown_slot() -> None:
     with pytest.raises(UnknownSlot):
         find_product(by_slot(Product(1, "Choco bons", 150, 10)), 9)
+
+
+def test_empty_slots_is_empty_when_every_slot_has_stock() -> None:
+    products = by_slot(Product(1, "Choco bons", 150, 10), Product(2, "KitKat", 130, 5))
+    assert empty_slots(products) == []
+
+
+def test_empty_slots_lists_only_the_sold_out_products() -> None:
+    products = by_slot(
+        Product(1, "Choco bons", 150, 10),
+        Product(2, "KitKat", 130, 0),
+        Product(3, "Water", 100, 8),
+    )
+    assert empty_slots(products) == [Product(2, "KitKat", 130, 0)]
+
+
+def test_empty_slots_lists_every_product_when_the_machine_is_empty() -> None:
+    products = by_slot(Product(1, "Choco bons", 150, 0), Product(2, "KitKat", 130, 0))
+    assert empty_slots(products) == list(products.values())
