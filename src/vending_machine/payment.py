@@ -10,8 +10,8 @@ def credit_from_coins(coins: Coins) -> int:
     return sum(coin * count for coin, count in coins.items())
 
 
-def add_coins(first: Coins, second: Coins) -> Coins:
-    return {coin: first.get(coin, 0) + second.get(coin, 0) for coin in first | second}
+def add_coins(held: Coins, added: Coins) -> Coins:
+    return {coin: held.get(coin, 0) + added.get(coin, 0) for coin in held | added}
 
 
 def remove_coins(coins: Coins, taken: Coins) -> Coins:
