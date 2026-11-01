@@ -14,3 +14,7 @@ def affordable_products(products: Products, credit_cents: int) -> list[Product]:
         for product in products.values()
         if product.quantity > 0 and product.price_cents <= credit_cents
     ]
+
+
+def empty_slots(products: Products) -> list[Product]:
+    return [product for product in products.values() if product.quantity <= 0]
