@@ -40,3 +40,36 @@ def test_write_state_then_read_state_gives_the_same_machine(tmp_path: Path) -> N
     write_state(state, products_file, coins_file)
     assert read_state(products_file, coins_file) == state
     assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_read_products_rejects_a_price_of_zero_or_less(tmp_path: Path) -> None:
+    products_file = tmp_path / "products.csv"
+    products_file.write_text("slot,name,price_cents,quantity\n1,KitKat,-50,5\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="price must be more than 0 on line 2"):
+        read_products(products_file)
+
+
+def test_read_products_rejects_a_negative_quantity(tmp_path: Path) -> None:
+    products_file = tmp_path / "products.csv"
+    products_file.write_text("slot,name,price_cents,quantity\n1,KitKat,130,-3\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="quantity cannot be negative on line 2"):
+        read_products(products_file)
+
+
+def test_read_coin_float_rejects_a_coin_that_is_not_accepted(tmp_path: Path) -> None:
+    coins_file = tmp_path / "machine_coins_change.csv"
+    coins_file.write_text("coin_cents,count\n50,3\n3,4\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="coin 3 is not accepted on line 3"):
+        read_coin_float(coins_file)
+
+
+def test_read_coin_float_rejects_a_negative_count(tmp_path: Path) -> None:
+    coins_file = tmp_path / "machine_coins_change.csv"
+    coins_file.write_text("coin_cents,count\n50,-1\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="coin count cannot be negative on line 2"):
+        read_coin_float(coins_file)
+
+
+def test_read_products_explains_a_missing_file(tmp_path: Path) -> None:
+    with pytest.raises(FileNotFoundError, match="not found"):
+        read_products(tmp_path / "missing.csv")
