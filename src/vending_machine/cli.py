@@ -29,11 +29,12 @@ def exit_with_error(error: Exception) -> NoReturn:
 
 @app.callback()
 def main() -> None:
-    """A vending machine"""
+    """A terminal vending machine that sells products and gives change."""
 
 
 @app.command()
 def products(stock: StockOption = DEFAULT_STOCK) -> None:
+    """List every product with its slot and price, or SOLD OUT."""
     try:
         for line in format_product_lines(list(read_products(stock).values())):
             typer.echo(line)
@@ -43,6 +44,7 @@ def products(stock: StockOption = DEFAULT_STOCK) -> None:
 
 @app.command()
 def affordable(coins: CoinsArgument, stock: StockOption = DEFAULT_STOCK) -> None:
+    """Show your credit and the products you can buy with these coins."""
     try:
         credit = credit_from_coins(Counter(coins))
         typer.echo(f"Credit: {format_cents(credit)}")
@@ -59,6 +61,7 @@ def buy(
     stock: StockOption = DEFAULT_STOCK,
     coins_file: CoinsFileOption = DEFAULT_COINS_FILE,
 ) -> None:
+    """Buy the product in SLOT with COINS, get your change, and save the machine."""
     try:
         result = sell(read_state(stock, coins_file), slot, Counter(coins))
         write_state(result.state, stock, coins_file)
