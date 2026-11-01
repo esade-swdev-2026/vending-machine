@@ -5,7 +5,7 @@ from typing import Annotated, NoReturn
 import typer
 
 from vending_machine.formatting import format_cents, format_change, format_product_lines
-from vending_machine.inventory import affordable_products
+from vending_machine.inventory import affordable_products, empty_slots
 from vending_machine.machine import sell
 from vending_machine.models import VendingError
 from vending_machine.payment import credit_from_coins
@@ -69,3 +69,18 @@ def buy(
         typer.echo(f"Change: {format_change(result.sale.change)}")
     except (VendingError, OSError, ValueError) as error:
         exit_with_error(error)
+
+
+@app.command()
+def refill(stock: StockOption = DEFAULT_STOCK) -> None:
+    """For the owner: list the empty slots that need a refill."""
+    try:
+        slots_to_refill = empty_slots(read_products(stock))
+    except (VendingError, OSError, ValueError) as error:
+        exit_with_error(error)
+    if not slots_to_refill:
+        typer.echo("Every slot has stock. Nothing to refill.")
+        return
+    typer.echo(f"{len(slots_to_refill)} slot(s) to refill:")
+    for line in format_product_lines(slots_to_refill):
+        typer.echo(line)
