@@ -92,3 +92,60 @@ def test_sell_raises_when_credit_is_too_low() -> None:
 def test_sell_raises_when_change_cannot_be_made() -> None:
     with pytest.raises(CannotMakeChange):
         sell(MachineState(PRODUCTS, {}), 1, {200: 1})
+
+
+def test_successful_sale_increases_session_revenue() -> None:
+    product = Product(
+        slot=1,
+        name="Water",
+        price_cents=100,
+        quantity=3,
+    )
+    state = MachineState(
+        products={1: product},
+        coin_float={},
+        revenue_cents=0,
+    )
+    result = sell(state, slot=1, coins={100: 1})
+    assert result.state.revenue_cents == 100
+
+
+def test_session_revenue_accumulates_across_sales() -> None:
+    product = Product(slot=1, name="Water", price_cents=100, quantity=3)
+    state = MachineState(
+        products={1: product},
+        coin_float={},
+        revenue_cents=0,
+    )
+    first_sale = sell(state, slot=1, coins={100: 1})
+    second_sale = sell(first_sale.state, slot=1, coins={100: 1})
+    assert first_sale.state.revenue_cents == 100
+    assert second_sale.state.revenue_cents == 200
+    assert second_sale.state.products[1].quantity == 1
+
+
+def test_failed_sale_does_not_increase_session_revenue() -> None:
+    product = Product(slot=1, name="Water", price_cents=100, quantity=3)
+    state = MachineState(
+        products={1: product},
+        coin_float={},
+        revenue_cents=250,
+    )
+    with pytest.raises(InsufficientCredit):
+        sell(state, slot=1, coins={50: 1})
+    assert state.revenue_cents == 250
+    assert state.products[1].quantity == 3
+
+
+def test_revenue_uses_product_price_not_inserted_coins() -> None:
+    product = Product(slot=1, name="Water", price_cents=100, quantity=3)
+    state = MachineState(
+        products={1: product},
+        coin_float={100: 1},
+        revenue_cents=250,
+    )
+
+    result = sell(state, slot=1, coins={200: 1})
+
+    assert result.state.revenue_cents == 350
+    assert result.sale.change == {100: 1}
