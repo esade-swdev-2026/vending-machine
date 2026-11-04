@@ -24,4 +24,6 @@ def empty_slots(products: Products) -> list[Product]:
 
 def restock_slot(products: Products, slot: int, new_units: int) -> Products:
     product = find_product(products, slot)
+    if new_units <= 0:
+        raise ValueError("Restock at least 1 unit.")
     return {**products, slot: replace(product, quantity=product.quantity + new_units)}

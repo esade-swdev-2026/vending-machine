@@ -105,3 +105,9 @@ def test_restock_slot_raises_for_unknown_slot() -> None:
     products = by_slot(Product(1, "Choco bons", 150, 10))
     with pytest.raises(UnknownSlot):
         restock_slot(products, 9, 5)
+
+
+@pytest.mark.parametrize("units", [0, -3])
+def test_restock_slot_rejects_zero_or_negative_units(units: int) -> None:
+    with pytest.raises(ValueError, match="at least 1 unit"):
+        restock_slot(by_slot(Product(2, "KitKat", 130, 5)), 2, units)
