@@ -1,6 +1,6 @@
 import pytest
 
-from vending_machine.inventory import affordable_products, empty_slots, find_product
+from vending_machine.inventory import affordable_products, empty_slots, find_product, restock_slot
 from vending_machine.models import Product, Products, UnknownSlot
 
 
@@ -81,3 +81,27 @@ def test_empty_slots_lists_only_the_sold_out_products() -> None:
 def test_empty_slots_lists_every_product_when_the_machine_is_empty() -> None:
     products = by_slot(Product(1, "Choco bons", 150, 0), Product(2, "KitKat", 130, 0))
     assert empty_slots(products) == list(products.values())
+
+
+def test_restock_slot_fills_an_empty_slot() -> None:
+    products = by_slot(Product(3, "Kinder Bueno", 180, 0))
+    results = restock_slot(products, 3, 10)
+    assert results[3] == Product(3, "Kinder Bueno", 180, 10)
+
+
+def test_restock_slot_adds_to_the_units_already_there() -> None:
+    products = by_slot(Product(2, "KitKat", 130, 5))
+    results = restock_slot(products, 2, 3)
+    assert results[2].quantity == 8
+
+
+def test_restock_slot_leaves_the_original_products_unchanged() -> None:
+    products = by_slot(Product(2, "KitKat", 130, 5))
+    restock_slot(products, 2, 3)
+    assert products[2].quantity == 5
+
+
+def test_restock_slot_raises_for_unknown_slot() -> None:
+    products = by_slot(Product(1, "Choco bons", 150, 10))
+    with pytest.raises(UnknownSlot):
+        restock_slot(products, 9, 5)

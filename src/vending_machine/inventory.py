@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from vending_machine.models import Product, Products, UnknownSlot
 
 
@@ -18,3 +20,8 @@ def affordable_products(products: Products, credit_cents: int) -> list[Product]:
 
 def empty_slots(products: Products) -> list[Product]:
     return [product for product in products.values() if product.quantity <= 0]
+
+
+def restock_slot(products: Products, slot: int, new_units: int) -> Products:
+    product = find_product(products, slot)
+    return {**products, slot: replace(product, quantity=product.quantity + new_units)}
