@@ -6,6 +6,7 @@ from vending_machine.models import ACCEPTED_COINS_CENTS, Coins, MachineState, Pr
 PRODUCT_COLUMNS = ["slot", "name", "price_cents", "quantity"]
 COIN_COLUMNS = ["coin_cents", "count"]
 FIRST_DATA_LINE = 2
+REVENUE_COLUMNS = ["revenue_cents"]
 
 
 def read_products(path: Path) -> Products:
@@ -49,11 +50,49 @@ def read_coin_float(path: Path) -> Coins:
     return coin_float
 
 
-def read_state(products_path: Path, coins_path: Path) -> MachineState:
-    return MachineState(read_products(products_path), read_coin_float(coins_path))
+def read_revenue(path: Path) -> int:
+    if not path.exists():
+        return 0
+    with path.open(newline="", encoding="utf-8") as file:
+        reader = csv.DictReader(file)
+        rows = list(reader)
+    if len(rows) != 1:
+        raise ValueError(f"{path}: expected exactly one revenue row.")
+    try:
+        revenue = int(rows[0]["revenue_cents"])
+    except (KeyError, TypeError, ValueError) as error:
+        raise ValueError(f"{path}: invalid revenue.") from error
+    if revenue < 0:
+        raise ValueError(f"{path}: revenue cannot be negative.")
+    return revenue
 
 
-def write_state(state: MachineState, products_path: Path, coins_path: Path) -> None:
+def write_revenue(path: Path, revenue_cents: int) -> None:
+    if revenue_cents < 0:
+        raise ValueError("Revenue cannot be negative.")
+
+    _write_csv(
+        path,
+        REVENUE_COLUMNS,
+        [{"revenue_cents": revenue_cents}],
+    )
+
+
+def read_state(
+    products_path: Path, coins_path: Path, revenue_path: Path | None = None
+) -> MachineState:
+    if revenue_path is None:
+        revenue_path = products_path.with_name("revenue.csv")
+    return MachineState(
+        read_products(products_path), read_coin_float(coins_path), read_revenue(revenue_path)
+    )
+
+
+def write_state(
+    state: MachineState, products_path: Path, coins_path: Path, revenue_path: Path | None = None
+) -> None:
+    if revenue_path is None:
+        revenue_path = products_path.with_name("revenue.csv")
     product_rows: list[dict[str, int | str]] = [
         {
             "slot": product.slot,
@@ -69,6 +108,7 @@ def write_state(state: MachineState, products_path: Path, coins_path: Path) -> N
     ]
     _write_csv(products_path, PRODUCT_COLUMNS, product_rows)
     _write_csv(coins_path, COIN_COLUMNS, coin_rows)
+    write_revenue(revenue_path, state.revenue_cents)
 
 
 def _check_file_exists(path: Path) -> None:

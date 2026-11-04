@@ -73,3 +73,23 @@ def test_read_coin_float_rejects_a_negative_count(tmp_path: Path) -> None:
 def test_read_products_explains_a_missing_file(tmp_path: Path) -> None:
     with pytest.raises(FileNotFoundError, match="not found"):
         read_products(tmp_path / "missing.csv")
+
+
+def test_session_revenue_survives_save_and_reload(tmp_path: Path) -> None:
+    products_path = tmp_path / "products.csv"
+    coins_path = tmp_path / "coins.csv"
+    state = MachineState(
+        products={
+            1: Product(
+                slot=1,
+                name="Water",
+                price_cents=100,
+                quantity=2,
+            )
+        },
+        coin_float={100: 2},
+        revenue_cents=250,
+    )
+    write_state(state, products_path, coins_path)
+    loaded_state = read_state(products_path, coins_path)
+    assert loaded_state.revenue_cents == 250

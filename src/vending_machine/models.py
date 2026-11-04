@@ -26,6 +26,7 @@ class Sale:
 class MachineState:
     products: Products
     coin_float: Coins
+    revenue_cents: int = 0
 
 
 @dataclass(frozen=True)

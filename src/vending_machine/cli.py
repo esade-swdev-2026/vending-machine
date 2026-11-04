@@ -9,17 +9,28 @@ from vending_machine.inventory import affordable_products, empty_slots
 from vending_machine.machine import sell
 from vending_machine.models import VendingError
 from vending_machine.payment import credit_from_coins
-from vending_machine.storage import read_products, read_state, write_state
+from vending_machine.storage import (
+    read_products,
+    read_revenue,
+    read_state,
+    write_revenue,
+    write_state,
+)
 
 app = typer.Typer(help="A terminal vending machine that sells products and gives change.")
 
 StockOption = Annotated[Path, typer.Option("--stock", help="Products CSV file.")]
 CoinsFileOption = Annotated[Path, typer.Option("--coins-file", help="Coin float CSV file.")]
+RevenueFileOption = Annotated[
+    Path,
+    typer.Option("--revenue-file", help="Session revenue CSV file."),
+]
 CoinsArgument = Annotated[list[int], typer.Argument(help="Inserted coins, in cents.")]
 SlotArgument = Annotated[int, typer.Argument(help="Slot number of the product to buy.")]
 
 DEFAULT_STOCK = Path("data/products.csv")
 DEFAULT_COINS_FILE = Path("data/machine_coins_change.csv")
+DEFAULT_REVENUE_FILE = Path("data/revenue.csv")
 
 
 def exit_with_error(error: Exception) -> NoReturn:
@@ -60,11 +71,12 @@ def buy(
     coins: CoinsArgument,
     stock: StockOption = DEFAULT_STOCK,
     coins_file: CoinsFileOption = DEFAULT_COINS_FILE,
+    revenue_file: RevenueFileOption = DEFAULT_REVENUE_FILE,
 ) -> None:
     """Buy the product in SLOT with COINS, get your change, and save the machine."""
     try:
-        result = sell(read_state(stock, coins_file), slot, Counter(coins))
-        write_state(result.state, stock, coins_file)
+        result = sell(read_state(stock, coins_file, revenue_file), slot, Counter(coins))
+        write_state(result.state, stock, coins_file, revenue_file)
         typer.echo(f"Enjoy your {result.sale.product.name}!")
         typer.echo(f"Change: {format_change(result.sale.change)}")
     except (VendingError, OSError, ValueError) as error:
@@ -84,3 +96,25 @@ def refill(stock: StockOption = DEFAULT_STOCK) -> None:
     typer.echo(f"{len(slots_to_refill)} slot(s) to refill:")
     for line in format_product_lines(slots_to_refill):
         typer.echo(line)
+
+
+@app.command()
+def revenue(revenue_file: RevenueFileOption = DEFAULT_REVENUE_FILE) -> None:
+    """For the owner: show the current session revenue."""
+    try:
+        total_cents = read_revenue(revenue_file)
+        typer.echo(f"Current session revenue: {format_cents(total_cents)}")
+    except (OSError, ValueError) as error:
+        exit_with_error(error)
+
+
+@app.command()
+def start_session(
+    revenue_file: RevenueFileOption = DEFAULT_REVENUE_FILE,
+) -> None:
+    """For the owner: start a new session with zero revenue."""
+    try:
+        write_revenue(revenue_file, 0)
+        typer.echo("New session started. Revenue: 0.00 €")
+    except (OSError, ValueError) as error:
+        exit_with_error(error)
