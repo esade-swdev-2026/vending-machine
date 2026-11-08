@@ -56,3 +56,7 @@ class InsufficientCredit(VendingError):
 
 class CannotMakeChange(VendingError):
     pass
+
+
+class InvalidQuantity(VendingError):
+    pass
