@@ -26,5 +26,6 @@ def sell(state: MachineState, slot: int, coins: Coins) -> SaleResult:
     new_state = MachineState(
         products={**state.products, slot: replace(product, quantity=product.quantity - 1)},
         coin_float=remove_coins(coins_in_machine, change),
+        revenue_cents=state.revenue_cents + product.price_cents,
     )
     return SaleResult(Sale(product, change), new_state)
