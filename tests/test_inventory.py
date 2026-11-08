@@ -1,7 +1,7 @@
 import pytest
 
 from vending_machine.inventory import affordable_products, empty_slots, find_product, restock_slot
-from vending_machine.models import Product, Products, UnknownSlot
+from vending_machine.models import InvalidQuantity, Product, Products, UnknownSlot
 
 
 def by_slot(*products: Product) -> Products:
@@ -109,5 +109,11 @@ def test_restock_slot_raises_for_unknown_slot() -> None:
 
 @pytest.mark.parametrize("units", [0, -3])
 def test_restock_slot_rejects_zero_or_negative_units(units: int) -> None:
-    with pytest.raises(ValueError, match="at least 1 unit"):
+    with pytest.raises(InvalidQuantity, match="at least 1 unit"):
         restock_slot(by_slot(Product(2, "KitKat", 130, 5)), 2, units)
+
+
+def test_restock_slot_raises_when_exceeding_max_capacity() -> None:
+    products = by_slot(Product(1, "Choco bons", 150, 15))
+    with pytest.raises(InvalidQuantity, match="holds at most"):
+        restock_slot(products, 1, 10)

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from vending_machine.cli import app
@@ -53,6 +54,18 @@ def test_restock_unknown_slot_exits_with_error_and_saves_nothing(tmp_path: Path)
     result = runner.invoke(app, ["restock", "99", "3", *files])
     assert result.exit_code == 1
     assert "Error: No product in slot 99." in result.output
+    assert (tmp_path / "products.csv").read_text(encoding="utf-8") == before
+
+
+@pytest.mark.parametrize("bad_units", ["0", "-3", "99"])
+def test_restock_invalid_quantity_exits_with_error_and_saves_nothing(
+    tmp_path: Path, bad_units: str
+) -> None:
+    files = write_data_files(tmp_path)
+    before = (tmp_path / "products.csv").read_text(encoding="utf-8")
+    result = runner.invoke(app, ["restock", *files, "--", "2", bad_units])
+    assert result.exit_code == 1
+    assert "Error:" in result.output
     assert (tmp_path / "products.csv").read_text(encoding="utf-8") == before
 
 
