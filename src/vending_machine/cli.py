@@ -1,11 +1,12 @@
 from collections import Counter
+from dataclasses import replace
 from pathlib import Path
 from typing import Annotated, NoReturn
 
 import typer
 
 from vending_machine.formatting import format_cents, format_change, format_product_lines
-from vending_machine.inventory import affordable_products, empty_slots
+from vending_machine.inventory import affordable_products, empty_slots, restock_slot
 from vending_machine.machine import sell
 from vending_machine.models import VendingError
 from vending_machine.payment import credit_from_coins
@@ -27,6 +28,8 @@ RevenueFileOption = Annotated[
 ]
 CoinsArgument = Annotated[list[int], typer.Argument(help="Inserted coins, in cents.")]
 SlotArgument = Annotated[int, typer.Argument(help="Slot number of the product to buy.")]
+RestockSlotArgument = Annotated[int, typer.Argument(help="Slot number to restock.")]
+UnitsArgument = Annotated[int, typer.Argument(help="Units to add to the slot.")]
 
 DEFAULT_STOCK = Path("data/products.csv")
 DEFAULT_COINS_FILE = Path("data/machine_coins_change.csv")
@@ -84,6 +87,25 @@ def buy(
 
 
 @app.command()
+def restock(
+    slot: RestockSlotArgument,
+    units: UnitsArgument,
+    stock: StockOption = DEFAULT_STOCK,
+    coins_file: CoinsFileOption = DEFAULT_COINS_FILE,
+    revenue_file: RevenueFileOption = DEFAULT_REVENUE_FILE,
+) -> None:
+    """For the owner: add UNITS to the product in SLOT and save the stock."""
+    try:
+        state = read_state(stock, coins_file, revenue_file)
+        new_state = replace(state, products=restock_slot(state.products, slot, units))
+        write_state(new_state, stock, coins_file, revenue_file)
+    except (VendingError, OSError, ValueError) as error:
+        exit_with_error(error)
+    product = new_state.products[slot]
+    typer.echo(f"Slot {slot}: {product.name} now has {product.quantity} units.")
+
+
+@app.command()
 def refill(stock: StockOption = DEFAULT_STOCK) -> None:
     """For the owner: list the empty slots that need a refill."""
     try:
@@ -115,6 +137,6 @@ def start_session(
     """For the owner: start a new session with zero revenue."""
     try:
         write_revenue(revenue_file, 0)
-        typer.echo("New session started. Revenue: 0.00 €")
+        typer.echo(f"New session started. Revenue: {format_cents(0)}")
     except (OSError, ValueError) as error:
         exit_with_error(error)

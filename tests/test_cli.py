@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from vending_machine.cli import app
@@ -59,6 +60,34 @@ def test_buy_unknown_slot_exits_with_error_and_saves_nothing(
     assert products_path.read_text(encoding="utf-8") == products_before
     assert revenue_path.read_text(encoding="utf-8") == revenue_before
     assert read_revenue(revenue_path) == 620
+
+
+def test_restock_saves_the_new_quantity(tmp_path: Path) -> None:
+    result = runner.invoke(app, ["restock", "2", "3", *write_data_files(tmp_path)])
+    assert result.exit_code == 0
+    assert "Slot 2: KitKat now has 8 units." in result.output
+    assert "2,KitKat,130,8" in (tmp_path / "products.csv").read_text(encoding="utf-8")
+
+
+def test_restock_unknown_slot_exits_with_error_and_saves_nothing(tmp_path: Path) -> None:
+    files = write_data_files(tmp_path)
+    before = (tmp_path / "products.csv").read_text(encoding="utf-8")
+    result = runner.invoke(app, ["restock", "99", "3", *files])
+    assert result.exit_code == 1
+    assert "Error: No product in slot 99." in result.output
+    assert (tmp_path / "products.csv").read_text(encoding="utf-8") == before
+
+
+@pytest.mark.parametrize("bad_units", ["0", "-3", "99"])
+def test_restock_invalid_quantity_exits_with_error_and_saves_nothing(
+    tmp_path: Path, bad_units: str
+) -> None:
+    files = write_data_files(tmp_path)
+    before = (tmp_path / "products.csv").read_text(encoding="utf-8")
+    result = runner.invoke(app, ["restock", *files, "--", "2", bad_units])
+    assert result.exit_code == 1
+    assert "Error:" in result.output
+    assert (tmp_path / "products.csv").read_text(encoding="utf-8") == before
 
 
 def test_help_describes_every_command() -> None:

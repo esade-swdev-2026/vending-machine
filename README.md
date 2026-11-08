@@ -69,6 +69,15 @@ goes down by one, and `data/machine_coins_change.csv` gets the inserted coins an
 After 5 KitKat sales, `products` shows `SOLD OUT` for slot 2. A failed sale (any error below) saves nothing.
 To reset the sample data, run `git checkout data/`.
 
+### Owner: restock a slot
+
+`restock SLOT UNITS`: put 10 Kinder Bueno back in slot 3:
+
+```
+$ uv run vending-machine restock 3 10
+Slot 3: Kinder Bueno now has 10 units.
+```
+
 ### Owner: see which slots need a refill
 
 ```text
@@ -107,9 +116,9 @@ The counter then accumulates revenue from subsequent successful purchases.
 
 | option | commands | default | meaning |
 |---|---|---|---|
-| `--stock PATH` | `products`, `affordable`, `buy`, `refill` | `data/products.csv` | The products CSV file |
-| `--coins-file PATH` | `buy` | `data/machine_coins_change.csv` | The coins available for change |
-| `--revenue-file PATH` | `buy`, `revenue`, `start-session` | `data/revenue.csv` | The session revenue CSV file |
+| `--stock PATH` | `products`, `affordable`, `buy`, `restock`, `refill` | `data/products.csv` | The products CSV file |
+| `--coins-file PATH` | `buy`, `restock` | `data/machine_coins_change.csv` | The coins available for change |
+| `--revenue-file PATH` | `buy`, `restock`, `revenue`, `start-session` | `data/revenue.csv` | The session revenue CSV file |
 
 ## Errors
 
@@ -128,6 +137,7 @@ Bad input never shows a traceback: it prints `Error: ...` and exits with code 1.
 | price of 0 or less in the CSV        | (a row with `price_cents` = `-50`)                    | `Error: data/products.csv: price must be more than 0 on line 2.` |
 | negative quantity in the CSV         | (a row with `quantity` = `-3`)                        | `Error: data/products.csv: quantity cannot be negative on line 2.` |
 | unknown coin in the coin file        | (a row with `coin_cents` = `3`)                       | `Error: data/machine_coins_change.csv: coin 3 is not accepted on line 2.` |
+| restock 0 units or fewer             | `uv run vending-machine restock 3 0`                  | `Error: Restock at least 1 unit.`                           |
 
 ## Data files
 
@@ -186,7 +196,7 @@ The machine is plain data, and a sale is a function from the machine before to t
 src/vending_machine/
   models.py       Product, Sale, MachineState, SaleResult, the Coins/Products types,
                   the accepted coins and the error classes (no I/O)
-  inventory.py    find_product, affordable_products, empty_slots (pure)
+  inventory.py    find_product, affordable_products, empty_slots, restock_slots (pure)
   payment.py      credit_from_coins, add_coins, remove_coins, make_change (pure)
   machine.py      sell: one whole purchase, old state in, new state out (pure)
   formatting.py   format_cents, format_change, format_product_lines (pure)
