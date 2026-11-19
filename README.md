@@ -152,6 +152,23 @@ docker run --rm -v vending-machine-data:/app/data vending-machine revenue
 
 On fresh machine data, a successful purchase of slot 2 generates 1.30 € in session revenue. The second container reads the updated revenue from the shared volume.
 
+
+### Pull the published image from GHCR
+
+Once the `v1.0` image is published to GitHub Container Registry (GHCR), you can download it instead of building it locally:
+
+```bash
+docker pull ghcr.io/esade-swdev-2026/vending-machine:v1.0
+```
+
+To use the downloaded image with the existing Docker commands, tag it as `vending-machine:latest`:
+
+```bash
+docker tag ghcr.io/esade-swdev-2026/vending-machine:v1.0 vending-machine:latest
+```
+
+**Publication status:** The `v1.0` image is not yet verified as published on GHCR. Until it becomes available, use the local `docker build` instructions above.
+
 ## Errors
 
 Bad input never shows a traceback: it prints `Error: ...` and exits with code 1.
