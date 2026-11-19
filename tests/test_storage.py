@@ -3,7 +3,13 @@ from pathlib import Path
 import pytest
 
 from vending_machine.models import MachineState, Product
-from vending_machine.storage import read_coin_float, read_products, read_state, write_state
+from vending_machine.storage import (
+    read_coin_float,
+    read_products,
+    read_revenue,
+    read_state,
+    write_state,
+)
 
 
 def test_read_products_and_coin_float(tmp_path: Path) -> None:
@@ -37,8 +43,8 @@ def test_write_state_then_read_state_gives_the_same_machine(tmp_path: Path) -> N
     state = MachineState({1: Product(1, "KitKat", 130, 4)}, {50: 3, 20: 0})
     products_file = tmp_path / "products.csv"
     coins_file = tmp_path / "machine_coins_change.csv"
-    write_state(state, products_file, coins_file)
-    assert read_state(products_file, coins_file) == state
+    write_state(state, products_file, coins_file, tmp_path / "revenue.csv")
+    assert read_state(products_file, coins_file, tmp_path / "revenue.csv") == state
     assert not list(tmp_path.glob("*.tmp"))
 
 
@@ -90,6 +96,17 @@ def test_session_revenue_survives_save_and_reload(tmp_path: Path) -> None:
         coin_float={100: 2},
         revenue_cents=250,
     )
-    write_state(state, products_path, coins_path)
-    loaded_state = read_state(products_path, coins_path)
+    write_state(state, products_path, coins_path, tmp_path / "revenue.csv")
+    loaded_state = read_state(products_path, coins_path, tmp_path / "revenue.csv")
     assert loaded_state.revenue_cents == 250
+
+
+def test_read_revenue_of_a_missing_file_is_zero(tmp_path: Path) -> None:
+    assert read_revenue(tmp_path / "revenue.csv") == 0
+
+
+def test_read_revenue_rejects_a_negative_total(tmp_path: Path) -> None:
+    revenue_file = tmp_path / "revenue.csv"
+    revenue_file.write_text("revenue_cents\n-5\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="cannot be negative"):
+        read_revenue(revenue_file)
