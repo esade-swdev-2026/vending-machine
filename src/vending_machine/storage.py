@@ -78,21 +78,15 @@ def write_revenue(path: Path, revenue_cents: int) -> None:
     )
 
 
-def read_state(
-    products_path: Path, coins_path: Path, revenue_path: Path | None = None
-) -> MachineState:
-    if revenue_path is None:
-        revenue_path = products_path.with_name("revenue.csv")
+def read_state(products_path: Path, coins_path: Path, revenue_path: Path) -> MachineState:
     return MachineState(
         read_products(products_path), read_coin_float(coins_path), read_revenue(revenue_path)
     )
 
 
 def write_state(
-    state: MachineState, products_path: Path, coins_path: Path, revenue_path: Path | None = None
+    state: MachineState, products_path: Path, coins_path: Path, revenue_path: Path
 ) -> None:
-    if revenue_path is None:
-        revenue_path = products_path.with_name("revenue.csv")
     product_rows: list[dict[str, int | str]] = [
         {
             "slot": product.slot,

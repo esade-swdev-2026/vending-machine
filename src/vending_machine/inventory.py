@@ -33,4 +33,4 @@ def restock_slot(products: Products, slot: int, units_added: int) -> Products:
         raise InvalidQuantity(
             f"Slot {slot} holds at most {MAX_UNITS_PER_SLOT} units; it has {product.quantity}."
         )
-    return {**products, slot: replace(product, quantity=product.quantity + units_added)}
+    return {**products, slot: replace(product, quantity=new_quantity)}
