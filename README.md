@@ -267,9 +267,48 @@ pyproject.toml    dependencies and tool settings
 ```
 ## Use of AI
 
-We used AI as a supporting tool throughout the project to guide our development, clarify concepts and help us work through problems.
+## Use of AI
 
-We remained responsible for the final implementation and took the time to understand the suggestions we used. We understand how the different modules work together, how a purchase is processed, and how the machine handles stock, payments and change. We can explain the code and the decisions behind it.
+We used AI assistants (mainly Claude, plus ChatGPT now and then) as a second pair of eyes,
+not as the author of the project. The design of the machine, the split into modules
+(`inventory`, `payment`, `storage`, `cli`), the data files and the business rules
+(slot capacity, exact change, the session revenue counter) were decided by the group
+in class and in our own meetings. The AI helped with small, well-scoped tasks around that work:
+
+- **Code revision.** Before opening a pull request, some of us pasted our diff and asked
+  "what could go wrong here?". This is how we noticed, for example, that `restock_slot`
+  added the restocked units twice, and that `read_state` and `cli.py` each had their own
+  default path for the revenue file. The AI pointed at the problem; we wrote the fix and
+  the test that proves it ourselves.
+- **Edge cases for tests.** We asked for lists of inputs that could break a function
+  (an empty CSV, a negative price, a slot that doesn't exist, paying with too few coins).
+  We kept the ones that made sense for our rules, wrote the `pytest` tests by hand and
+  threw away the rest.
+- **Understanding tool errors.** When `mypy`, `ruff` or GitHub Actions failed with a message
+  we didn't understand, we asked the AI to explain it in plain words before fixing it.
+  It also helped us spot why Docker was ignoring our `.dockerignore` (the file name started
+  with a space).
+- **Wording.** Rephrasing a few error messages, the `--help` text of the CLI commands,
+  and some sentences of this README so they are short and clear.
+- **Checking against the rubric.** At each checkpoint we asked it to compare our repository
+  with the lab instructions and list anything we had missed. We then decided as a group
+  what to do and who would do it.
+
+What the AI did **not** do:
+
+- **It did not commit, push, merge or review anything.** Every commit in the history was
+  written and pushed by a member of the group from their own account. Every pull request
+  was opened by a member, reviewed by a different member (or by our partner group),
+  and squash-merged by a member after the review comments were answered.
+- **It did not get the last word.** Suggestions were only kept after we had read them,
+  run `bash scripts/check.sh` (tests, `ruff`, `mypy`) and, for the Docker part, built and
+  run the image ourselves. Several suggestions were rejected because they were too complex
+  for what the brief asks or did not fit our design.
+
+Each of us can open any file in this repository and explain what every function does,
+why it is written that way, and how it is tested. If something in the code was suggested
+by an AI, we understood it well enough to rewrite it in our own words before it was merged.
+
 
 ## Team
 
