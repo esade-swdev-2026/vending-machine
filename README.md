@@ -169,8 +169,6 @@ To use the downloaded image with the existing Docker commands, tag it as `vendin
 docker tag ghcr.io/esade-swdev-2026/vending-machine:v1.0 vending-machine:latest
 ```
 
-**Publication status:** The `v1.0` image is not yet verified as published on GHCR. Until it becomes available, use the local `docker build` instructions above.
-
 ## Errors
 
 Bad input never shows a traceback: it prints `Error: ...` and exits with code 1.
